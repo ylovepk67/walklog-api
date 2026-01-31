@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # walklog-api
 
 산책 기록 API 서비스.
@@ -50,7 +49,7 @@ npm run dev
 ## PRD / 요구사항
 
 - (별도 PRD 문서 또는 요구사항 목록 링크 추가 권장)
-=======
+
 # Walklog API
 
 ## PRD 요약
@@ -65,4 +64,3 @@ npm run dev
 ## Run
 - Java 17
 - ./gradlew bootRun
->>>>>>> 7bcee1b7d586f07c3848d5490f25a1a1c03034aa
