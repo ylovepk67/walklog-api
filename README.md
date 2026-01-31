@@ -217,6 +217,315 @@ gradlew.bat test --tests "HealthControllerTest"
 - `test/*`: 테스트 코드
 
 ---
+# Walklog API
+
+매일 걸음 수를 기록하고 조회하는 REST API
+
+---
+
+## 🚀 빠른 시작
+
+### 1. Docker로 실행 (권장)
+
+#### 사전 요구사항
+- Docker Desktop 설치
+- Docker Compose 설치
+
+#### 실행 방법
+
+```bash
+# 1. 저장소 클론
+git clone https://github.com/ylove0/walklog-api.git
+cd walklog-api
+
+# 2. Docker Compose로 실행
+docker-compose up --build
+
+# 3. API 테스트
+curl http://localhost:8080/api/health
+```
+
+#### 종료 방법
+
+```bash
+# 컨테이너 중지
+docker-compose down
+
+# 데이터까지 삭제
+docker-compose down -v
+```
+
+---
+
+### 2. 로컬에서 실행
+
+#### 사전 요구사항
+- JDK 17 이상
+- MariaDB 11.2 이상
+- Gradle 8.5 이상
+
+#### 실행 방법
+
+```bash
+# 1. MariaDB 데이터베이스 생성
+mysql -u root -p
+CREATE DATABASE walklogdb;
+CREATE USER 'walklog'@'localhost' IDENTIFIED BY 'walklog123';
+GRANT ALL PRIVILEGES ON walklogdb.* TO 'walklog'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
+
+# 2. 애플리케이션 실행
+gradlew.bat bootRun
+
+# 3. API 테스트
+curl http://localhost:8080/api/health
+```
+
+---
+
+## 📋 API 문서
+
+### 기본 정보
+- Base URL: `http://localhost:8080`
+- Content-Type: `application/json`
+
+### 엔드포인트
+
+#### 1. Health Check
+```bash
+GET /api/health
+```
+
+**응답:**
+```json
+{
+  "status": "UP"
+}
+```
+
+---
+
+#### 2. 걸음 수 기록
+```bash
+POST /api/steps
+```
+
+**요청:**
+```json
+{
+  "date": "2026-01-31",
+  "steps": 10000
+}
+```
+
+**응답:**
+```json
+{
+  "id": 1,
+  "date": "2026-01-31",
+  "steps": 10000
+}
+```
+
+---
+
+#### 3. 전체 기록 조회
+```bash
+GET /api/steps
+```
+
+**응답:**
+```json
+[
+  {
+    "id": 1,
+    "date": "2026-01-31",
+    "steps": 10000
+  }
+]
+```
+
+---
+
+#### 4. 특정 날짜 조회
+```bash
+GET /api/steps/{date}
+```
+
+**예시:**
+```bash
+GET /api/steps/2026-01-31
+```
+
+**응답:**
+```json
+{
+  "id": 1,
+  "date": "2026-01-31",
+  "steps": 10000
+}
+```
+
+---
+
+#### 5. 걸음 수 수정
+```bash
+PUT /api/steps/{id}
+```
+
+**요청:**
+```json
+{
+  "steps": 15000
+}
+```
+
+**응답:**
+```json
+{
+  "id": 1,
+  "date": "2026-01-31",
+  "steps": 15000
+}
+```
+
+---
+
+#### 6. 걸음 수 삭제
+```bash
+DELETE /api/steps/{id}
+```
+
+**응답:** 204 No Content
+
+---
+
+#### 7. 날짜 범위 조회
+```bash
+GET /api/steps/range?start={start_date}&end={end_date}
+```
+
+**예시:**
+```bash
+GET /api/steps/range?start=2026-01-28&end=2026-01-31
+```
+
+**응답:**
+```json
+[
+  {
+    "id": 1,
+    "date": "2026-01-28",
+    "steps": 7500
+  },
+  {
+    "id": 2,
+    "date": "2026-01-29",
+    "steps": 12000
+  }
+]
+```
+
+---
+
+#### 8. 통계 조회
+```bash
+GET /api/steps/statistics
+```
+
+**응답:**
+```json
+{
+  "totalSteps": 52000,
+  "averageSteps": 10400.0,
+  "maxSteps": 15000,
+  "minSteps": 7500,
+  "totalDays": 5
+}
+```
+
+---
+
+## 🛠 기술 스택
+
+- **Backend:** Spring Boot 3.2.2
+- **Language:** Java 17
+- **Database:** MariaDB 11.2
+- **ORM:** Spring Data JPA
+- **Build Tool:** Gradle 8.5
+- **Containerization:** Docker & Docker Compose
+- **Testing:** JUnit 5, Mockito, MockMvc
+
+---
+
+## 📁 프로젝트 구조
+
+```
+walklog-api/
+├── src/
+│   ├── main/
+│   │   ├── java/com/walklog/api/
+│   │   │   ├── controller/      # REST API 컨트롤러
+│   │   │   ├── service/          # 비즈니스 로직
+│   │   │   ├── repository/       # 데이터 접근 계층
+│   │   │   ├── entity/           # JPA 엔티티
+│   │   │   └── dto/              # 데이터 전송 객체
+│   │   └── resources/
+│   │       ├── application.properties
+│   │       └── application-docker.properties
+│   └── test/                     # 테스트 코드
+├── Dockerfile
+├── docker-compose.yml
+├── build.gradle
+└── README.md
+```
+
+---
+
+## 🧪 테스트
+
+### 전체 테스트 실행
+```bash
+gradlew.bat test
+```
+
+### 테스트 커버리지 확인
+```bash
+gradlew.bat test jacocoTestReport
+```
+
+**리포트 위치:** `build/reports/jacoco/test/html/index.html`
+
+---
+
+## 📦 Docker 이미지
+
+### 이미지 빌드
+```bash
+docker build -t walklog-api:latest .
+```
+
+### 이미지 실행
+```bash
+docker run -p 8080:8080 walklog-api:latest
+```
+
+---
+
+## 🔧 환경 변수
+
+### Docker Compose 환경 변수
+
+| 변수 | 설명 | 기본값 |
+|------|------|--------|
+| `MARIADB_ROOT_PASSWORD` | MariaDB root 비밀번호 | `root123` |
+| `MARIADB_DATABASE` | 데이터베이스 이름 | `walklogdb` |
+| `MARIADB_USER` | 데이터베이스 사용자 | `walklog` |
+| `MARIADB_PASSWORD` | 데이터베이스 비밀번호 | `walklog123` |
+| `SPRING_PROFILES_ACTIVE` | Spring Profile | `docker` |
+
+---
 
 ## 📄 라이선스
 MIT License
