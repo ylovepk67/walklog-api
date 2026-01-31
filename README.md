@@ -219,11 +219,16 @@ gradlew.bat test --tests "HealthControllerTest"
 ---
 
 ## 📄 라이선스
-
 MIT License
+=======
+- (별도 PRD 문서 또는 요구사항 목록 링크 추가 권장)
 
 ---
 
 ## 👤 Author
-
 ylovepk67
+
+## Run
+- Java 17
+- ./gradlew bootRun
+
